@@ -1,0 +1,2 @@
+../Core/Src/CircularBuffer.c:11:6:CircBuffInit	2
+../Core/Src/CircularBuffer.c:22:6:CircBuffUpdate	1

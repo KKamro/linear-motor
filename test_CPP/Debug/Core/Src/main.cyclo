@@ -1,0 +1,5 @@
+../Core/Inc/serial.hpp:22:2:UART::UART(UART_HandleTypeDef*, uint32_t)	1
+../Core/Inc/diode.hpp:22:2:Diode::Diode(GPIO_TypeDef*, uint16_t, GPIO_PinState)	1
+../Core/Src/main.cpp:67:5:int main()	1
+../Core/Src/main.cpp:116:6:void SystemClock_Config()	3
+../Core/Src/main.cpp:160:6:void Error_Handler()	1
