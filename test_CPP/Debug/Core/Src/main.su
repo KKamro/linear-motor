@@ -1,5 +1,0 @@
-../Core/Inc/serial.hpp:22:2:UART::UART(UART_HandleTypeDef*, uint32_t)	24	static
-../Core/Inc/diode.hpp:22:2:Diode::Diode(GPIO_TypeDef*, uint16_t, GPIO_PinState)	24	static
-../Core/Src/main.cpp:67:5:int main()	24	static
-../Core/Src/main.cpp:116:6:void SystemClock_Config()	88	static
-../Core/Src/main.cpp:160:6:void Error_Handler()	8	static,ignoring_inline_asm

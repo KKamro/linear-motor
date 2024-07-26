@@ -1,2 +1,0 @@
-../Core/Src/serial.cpp:10:6:void UART::print(const char*)	1
-../Core/Src/serial.cpp:14:6:void UART::println(const char*)	1

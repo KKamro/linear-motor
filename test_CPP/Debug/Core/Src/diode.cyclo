@@ -1,6 +1,0 @@
-../Core/Src/diode.cpp:9:6:void Diode::Toggle()	1
-../Core/Src/diode.cpp:13:6:void Diode::On()	1
-../Core/Src/diode.cpp:17:6:void Diode::Off()	1
-../Core/Src/diode.cpp:22:15:GPIO_TypeDef* Diode::GetDiodePort()	1
-../Core/Src/diode.cpp:26:10:uint16_t Diode::GetDiodePin()	1
-../Core/Src/diode.cpp:30:15:GPIO_PinState Diode::GetPinState()	1
