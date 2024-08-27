@@ -30,12 +30,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
-#include "math.h"
 #include "hbridge.h"
 #include "PID.h"
 #include "wire.h"
 #include "ds18b20.h"
-#include "MAFilter.h"
 #include "DigitalFilters.h"
 /* USER CODE END Includes */
 
@@ -76,6 +74,7 @@
 #define MAX_PWM					1
 #define PROP_CONST				0.011
 #define POSITION_TOLERANCE		2.0f
+
 // UART Buffer
 #define LINE_MAX_LENGTH 6
 
@@ -382,9 +381,8 @@ int main(void)
 						ADC_CURRENT[1] - ADC_OFFSET_CURRENT) * 2;
 
 				Length = sprintf((char*) Message,
-						"x: %.1f PWM1: %d PWM2: %d CoilT: %.1f\n\r", x,
-						coil1_PWM * PID_output, coil2_PWM * PID_output,
-						temp_coils);
+						"x: %.1f PWM1: %d PWM2: %d I1: %.1f I2: %.1f B1: %.4f B2: %.4f\n\r", x,
+						coil1_PWM * PID_output, coil2_PWM * PID_output, CURRENT[0], CURRENT[1], HALL[0], HALL[2]);
 				HAL_UART_Transmit_DMA(&huart2, Message, Length);
 
 			}
