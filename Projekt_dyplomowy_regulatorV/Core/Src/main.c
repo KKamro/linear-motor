@@ -49,29 +49,31 @@
 #define TEMP_COILS_PERIOD		749
 #define SHOW_TEMP				10000
 #define UC_SAMPLE_PERIOD		1
-#define VELOCITY_PERIOD			(UC_SAMPLE_PERIOD * 4)
-#define CONTROL_TIMER_PERIOD	(VELOCITY_PERIOD * 4)
+#define VELOCITY_PERIOD			(UC_SAMPLE_PERIOD * 2)
+#define CONTROL_TIMER_PERIOD	(VELOCITY_PERIOD * 1)
 
 // ADC
 #define ADC_MAX_VALUE 			4095
 #define ADC_OFFSET_HALL 		2044
-#define ADC_OFFSET_CURRENT 		1505
+#define ADC_OFFSET_CURRENT_1 	1505
+#define ADC_OFFSET_CURRENT_2 	1509
 #define VREF 					3.3
 #define SENSITIVITY_HALL 		3.125 // mV/Gauss
 #define GAUSS_TO_TESLA 			1e-4
 #define SENSITIVITY_CURRENT 	0.2 // V/A
 
 // PID
-#define PID_Kp 					4
-#define PID_Ki 					6
+#define PID_Kp 					5
+#define PID_Ki 					2.5
 #define PID_Kd 					0
 #define PID_WIND_UP 			50
 
 #define VELOCITY_SET			30
 
 // HBridge Control
-#define DEAD_ZONE 				100
+#define DEAD_ZONE 				50
 #define MAX_PWM					1
+#define MIN_PWM					30
 #define PROP_CONST				0.011
 #define POSITION_TOLERANCE		2.0f
 
@@ -143,7 +145,12 @@ int16_t HBridgeCalculatePWM_max(int32_t HALL)
 
 int16_t HBridgeCalculatePWM_prop(int32_t HALL)
 {
-	return HALL * PROP_CONST;
+	if(HALL > 1800 && HALL < 2000)
+		return -30;
+	else if(HALL >= 2000 && HALL < 2200)
+		return 30;
+	else
+		return 0.125 * HALL - 250;
 }
 
 void LineAppend(uint8_t value)
@@ -281,7 +288,7 @@ int main(void)
 	FilterMedianInit(&filter_median);
 	FilterMovingAverageInit(&filter_moving_average);
 	FilterLowPassInit(&lpf_position, 0.01);
-	FilterLowPassInit(&lpf_velocity, 0.02);
+	FilterLowPassInit(&lpf_velocity, 0.05);
 
 	// Software Timers
 	uint32_t TimerHeartBeat = HAL_GetTick();
@@ -334,6 +341,13 @@ int main(void)
 					FilterLowPassUpdate(&lpf_velocity,
 							(x - x_prev) / (0.001 * VELOCITY_PERIOD)));
 			x_prev = x;
+			CURRENT[0] = CalculateCurrent(ADC_CURRENT[0] - ADC_OFFSET_CURRENT_1)
+					* 2;
+			CURRENT[1] = CalculateCurrent(ADC_CURRENT[1] - ADC_OFFSET_CURRENT_2)
+					* 2;
+			HALL[0] = HallCalculateTesla(ADC_HALL[0]);
+			HALL[1] = HallCalculateTesla(ADC_HALL[1]);
+			HALL[2] = HallCalculateTesla(ADC_HALL[2]);
 			TimerVelocity = HAL_GetTick();
 		}
 
@@ -348,14 +362,11 @@ int main(void)
 		if (((HAL_GetTick() - TimerControl) > CONTROL_TIMER_PERIOD)
 				&& input_done && !critical_temp)
 		{
-			HALL[0] = HallCalculateTesla(ADC_HALL[0]);
-			HALL[1] = HallCalculateTesla(ADC_HALL[1]);
-			HALL[2] = HallCalculateTesla(ADC_HALL[2]);
 			if (abs(xset - x) >= POSITION_TOLERANCE)
 			{
 
-				PID_output = abs(
-						PIDCalculate(&pid, (int) vel_set, (int) velocity));
+				PID_output = abs(PIDCalculate(&pid, (int) vel_set, (int) velocity));
+//				PID_output = 1;
 
 				// Go left
 				if (x > xset)
@@ -364,6 +375,10 @@ int main(void)
 							(ADC_HALL[0] - ADC_OFFSET_HALL));
 					coil2_PWM = HBridgeCalculatePWM_max(
 							-(ADC_HALL[2] - ADC_OFFSET_HALL));
+//					coil1_PWM = HBridgeCalculatePWM_prop(
+//							(ADC_HALL[0]));
+//					coil2_PWM = HBridgeCalculatePWM_prop(
+//							(ADC_HALL[2]));
 				}
 				// Go right
 				else if (x < xset)
@@ -372,17 +387,20 @@ int main(void)
 							-(ADC_HALL[0] - ADC_OFFSET_HALL));
 					coil2_PWM = HBridgeCalculatePWM_max(
 							(ADC_HALL[2] - ADC_OFFSET_HALL));
+//					coil1_PWM = HBridgeCalculatePWM_prop(
+//							(ADC_HALL[0]));
+//					coil2_PWM = HBridgeCalculatePWM_prop(
+//							(ADC_HALL[2]));
 				}
 				HBridgeControl(&coil1, PID_output * coil1_PWM);
 				HBridgeControl(&coil2, PID_output * coil2_PWM);
-				CURRENT[0] = CalculateCurrent(
-						ADC_CURRENT[0] - ADC_OFFSET_CURRENT) * 2;
-				CURRENT[1] = CalculateCurrent(
-						ADC_CURRENT[1] - ADC_OFFSET_CURRENT) * 2;
 
-				Length = sprintf((char*) Message,
-						"x: %.1f PWM1: %d PWM2: %d I1: %.1f I2: %.1f B1: %.4f B2: %.4f\n\r", x,
-						coil1_PWM * PID_output, coil2_PWM * PID_output, CURRENT[0], CURRENT[1], HALL[0], HALL[2]);
+				Length =
+						sprintf((char*) Message,
+								"x: %.1f PWM1: %d PWM2: %d I1: %.1f I2: %.1f B1: %.4f B2: %.4f\n\r",
+								x, coil1_PWM * PID_output,
+								coil2_PWM * PID_output, CURRENT[0], CURRENT[1],
+								HALL[0], HALL[2]);
 				HAL_UART_Transmit_DMA(&huart2, Message, Length);
 
 			}

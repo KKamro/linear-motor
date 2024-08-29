@@ -29,6 +29,7 @@ void HBridgeControl(HBridge *hb, int16_t pwm_val)
 	}
 	else if(pwm_val < 0)
 	{
+		pwm_val *= -1;
 		__HAL_TIM_SET_COMPARE(hb->PWM_TIM, hb->TIM_CHANNEL, 0);
 		HAL_GPIO_WritePin(hb->DIR_PORT,hb->DIR_GPIO_PIN, GPIO_PIN_RESET);
 		__HAL_TIM_SET_COMPARE(hb->PWM_TIM, hb->TIM_CHANNEL, pwm_val);
