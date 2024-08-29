@@ -71,8 +71,8 @@
 #define VELOCITY_SET			30
 
 // HBridge Control
-#define DEAD_ZONE 				50
-#define MAX_PWM					1
+#define DEAD_ZONE 				500
+#define MAX_PWM					50
 #define MIN_PWM					30
 #define PROP_CONST				0.011
 #define POSITION_TOLERANCE		2.0f
@@ -365,8 +365,8 @@ int main(void)
 			if (abs(xset - x) >= POSITION_TOLERANCE)
 			{
 
-				PID_output = abs(PIDCalculate(&pid, (int) vel_set, (int) velocity));
-//				PID_output = 1;
+//				PID_output = abs(PIDCalculate(&pid, (int) vel_set, (int) velocity));
+				PID_output = 1;
 
 				// Go left
 				if (x > xset)
