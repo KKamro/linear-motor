@@ -1,2 +1,2 @@
-../Core/Src/CircularBuffer.c:11:6:CircBuffInit	24	static
-../Core/Src/CircularBuffer.c:22:6:CircBuffUpdate	16	static
+../Core/Src/CircularBuffer.c:11:6:CircBuffInit	0	static
+../Core/Src/CircularBuffer.c:22:6:CircBuffUpdate	4	static

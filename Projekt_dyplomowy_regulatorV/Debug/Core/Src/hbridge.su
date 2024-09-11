@@ -1,2 +1,2 @@
-../Core/Src/hbridge.c:10:6:HBridgeInit	24	static
+../Core/Src/hbridge.c:10:6:HBridgeInit	0	static
 ../Core/Src/hbridge.c:22:6:HBridgeControl	16	static

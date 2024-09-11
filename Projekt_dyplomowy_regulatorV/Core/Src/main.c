@@ -63,8 +63,8 @@
 #define SENSITIVITY_CURRENT 	0.2 // V/A
 
 // PID
-#define PID_Kp 					5
-#define PID_Ki 					2.5
+#define PID_Kp 					4
+#define PID_Ki 					6
 #define PID_Kd 					0
 #define PID_WIND_UP 			50
 
@@ -72,7 +72,7 @@
 
 // HBridge Control
 #define DEAD_ZONE 				500
-#define MAX_PWM					50
+#define MAX_PWM					90
 #define MIN_PWM					30
 #define PROP_CONST				0.011
 #define POSITION_TOLERANCE		2.0f
@@ -145,9 +145,9 @@ int16_t HBridgeCalculatePWM_max(int32_t HALL)
 
 int16_t HBridgeCalculatePWM_prop(int32_t HALL)
 {
-	if(HALL > 1800 && HALL < 2000)
+	if (HALL > 1800 && HALL < 2000)
 		return -30;
-	else if(HALL >= 2000 && HALL < 2200)
+	else if (HALL >= 2000 && HALL < 2200)
 		return 30;
 	else
 		return 0.125 * HALL - 250;
@@ -288,7 +288,7 @@ int main(void)
 	FilterMedianInit(&filter_median);
 	FilterMovingAverageInit(&filter_moving_average);
 	FilterLowPassInit(&lpf_position, 0.01);
-	FilterLowPassInit(&lpf_velocity, 0.05);
+	FilterLowPassInit(&lpf_velocity, 0.02);
 
 	// Software Timers
 	uint32_t TimerHeartBeat = HAL_GetTick();
@@ -299,9 +299,8 @@ int main(void)
 	uint32_t TimerVelocity = HAL_GetTick();
 	// Start UART to receive user input
 	HAL_UART_Receive_IT(&huart2, &uart_rx_buffer, 1);
-	uint8_t Message[64];
+	uint8_t Message[72];
 	uint8_t Length;
-//	int32_t x_int = 0, x_int_prev = 0;
 	int vel_set = VELOCITY_SET;
 	float x_prev = 0;
 	/* USER CODE END 2 */
@@ -317,12 +316,13 @@ int main(void)
 			static uint16_t start_message = 0;
 			start1 = HAL_TIM_ReadCapturedValue(&htim2, TIM_CHANNEL_1);
 			stop1 = HAL_TIM_ReadCapturedValue(&htim2, TIM_CHANNEL_2);
-			uint16_t input1 = FilterMedianUpdate(&filter_median,
-					(stop1 - start1));
-			//uint16_t input2 = FilterMovingAverageUpdate(&filter_moving_average, input1);
-			//uint16_t input2 = FilterMovingAverageUpdate(&filter_moving_average, input1);
+			uint16_t input1 = FilterMedianUpdate(&filter_median, (stop1 - start1));
 			x = FilterLowPassUpdate(&lpf_position, input1) * sonic_speed;
-
+			velocity = abs(FilterLowPassUpdate(&lpf_velocity, (x - x_prev) / ((HAL_GetTick() - TimerUCSample) * 0.001)));
+//			CURRENT[0] = CalculateCurrent(ADC_CURRENT[0] - ADC_OFFSET_CURRENT_1)
+//					* 2;
+//			CURRENT[1] = CalculateCurrent(ADC_CURRENT[1] - ADC_OFFSET_CURRENT_2)
+//					* 2;
 			if (start_message > 1000)
 			{
 				x_calculate = 1;
@@ -337,17 +337,13 @@ int main(void)
 
 		if ((HAL_GetTick() - TimerVelocity) > VELOCITY_PERIOD)
 		{
-			velocity = abs(
-					FilterLowPassUpdate(&lpf_velocity,
-							(x - x_prev) / (0.001 * VELOCITY_PERIOD)));
+//			velocity = abs(
+//					FilterLowPassUpdate(&lpf_velocity,
+//							(x - x_prev) / (0.001 * VELOCITY_PERIOD)));
 			x_prev = x;
-			CURRENT[0] = CalculateCurrent(ADC_CURRENT[0] - ADC_OFFSET_CURRENT_1)
-					* 2;
-			CURRENT[1] = CalculateCurrent(ADC_CURRENT[1] - ADC_OFFSET_CURRENT_2)
-					* 2;
-			HALL[0] = HallCalculateTesla(ADC_HALL[0]);
-			HALL[1] = HallCalculateTesla(ADC_HALL[1]);
-			HALL[2] = HallCalculateTesla(ADC_HALL[2]);
+//			HALL[0] = HallCalculateTesla(ADC_HALL[0]);
+//			HALL[1] = HallCalculateTesla(ADC_HALL[1]);
+//			HALL[2] = HallCalculateTesla(ADC_HALL[2]);
 			TimerVelocity = HAL_GetTick();
 		}
 
@@ -477,7 +473,6 @@ int main(void)
 			TimerHeartBeat = HAL_GetTick();
 		}
 
-		// TEST GITAAAAAAAAAA
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */

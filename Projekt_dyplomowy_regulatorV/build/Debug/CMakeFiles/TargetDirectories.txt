@@ -1,0 +1,3 @@
+C:/Users/48690/Desktop/Silnik_liniowy/STM/Projekt_dyplomowy_regulatorV/build/Debug/CMakeFiles/Linear_motor.dir
+C:/Users/48690/Desktop/Silnik_liniowy/STM/Projekt_dyplomowy_regulatorV/build/Debug/CMakeFiles/edit_cache.dir
+C:/Users/48690/Desktop/Silnik_liniowy/STM/Projekt_dyplomowy_regulatorV/build/Debug/CMakeFiles/rebuild_cache.dir

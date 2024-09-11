@@ -1,2 +1,2 @@
-../Core/Src/MAFilter.c:10:6:init_filter	24	static
-../Core/Src/MAFilter.c:21:9:update_filter	16	static
+../Core/Src/MAFilter.c:10:6:init_filter	8	static
+../Core/Src/MAFilter.c:21:9:update_filter	0	static

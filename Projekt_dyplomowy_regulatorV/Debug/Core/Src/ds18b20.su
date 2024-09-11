@@ -1,5 +1,3 @@
-../Core/Src/ds18b20.c:22:19:ds18b20_read_address	32	static
-../Core/Src/ds18b20.c:42:26:send_cmd	24	static
+../Core/Src/ds18b20.c:22:19:ds18b20_read_address	16	static
 ../Core/Src/ds18b20.c:60:19:ds18b20_start_measure	16	static
-../Core/Src/ds18b20.c:65:26:ds18b20_read_scratchpad	32	static
 ../Core/Src/ds18b20.c:83:9:ds18b20_get_temp	32	static

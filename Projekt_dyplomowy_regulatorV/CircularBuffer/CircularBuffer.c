@@ -27,3 +27,4 @@ void CircBuffUpdate(CircularBuffer *buff, int32_t new_data)
 	buff->head = buff->head % buff->size;
 }
 
+
